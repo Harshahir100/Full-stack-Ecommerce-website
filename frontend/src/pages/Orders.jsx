@@ -13,7 +13,7 @@ const Orders = () => {
       </div>
       <div>
         {
-          products.slice(1, 4).map((item, index) => (
+          products.map((item, index) => (
             <div key={index} className='flex flex-col gap-4 py-4 text-gray-700 border-t border-b md:flex-row md:items-center md:justify-between'>
               <div className='flex items-start gap-6 text-sm'>
                 <img className='w-16 sm:w-20' src={item.image[0]} alt="Photo" />

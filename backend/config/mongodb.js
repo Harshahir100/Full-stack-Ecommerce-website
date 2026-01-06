@@ -5,7 +5,8 @@ const connectDB = async () => {
     console.log("MongoDB connected");
   });
 
-  await mongoose.connect(`${process.env.MONGODB_URI}/trendify`);
+  await mongoose.connect(`${process.env.MONGODB_URI}`,   {useNewUrlParser: true,
+  useUnifiedTopology: true});
 };
 
 export default connectDB;

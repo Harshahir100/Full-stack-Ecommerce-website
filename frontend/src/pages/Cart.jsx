@@ -34,6 +34,7 @@ const Cart = () => {
       <div>
         {cartData.map((item, index) => {
           const productData = products.find((product) => product._id === item._id);
+          if (!productData) return null; // Skip rendering if product not found
 
           return (
             <div key={index} className='grid py-4 text-gray-700 border-t border-b grid-cols-[4fr_0.5fr_0.5fr] sm:grid-cols-[4fr_2fr_0.5fr] items-center gap-4'>
