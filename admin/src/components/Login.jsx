@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { assets } from "../assets/assets";
 import axios from "axios";
 import { backendUrl } from "../App";
@@ -7,24 +7,63 @@ import { toast } from "react-toastify";
 const Login = ({ setToken }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  
+  useEffect(() => {
+    console.log("🔗 Admin Login - Backend URL:", backendUrl);
+    if (!backendUrl || backendUrl === 'undefined') {
+      console.error("❌ Backend URL is not set!");
+      toast.error("Backend URL not configured. Please check environment variables.");
+    }
+  }, []);
 
   const onSubmitHandler = async (e) => {
+    e.preventDefault();
+    
+    // Show loading state
+    const submitButton = e.target.querySelector('button[type="submit"]');
+    const originalText = submitButton.textContent;
+    submitButton.disabled = true;
+    submitButton.textContent = "Logging in...";
+    
     try {
-      e.preventDefault();
+      console.log("🔐 Admin login attempt to:", backendUrl + "/api/user/admin");
+      console.log("📧 Email:", email);
+      
       const response = await axios.post(backendUrl + "/api/user/admin", {
         email,
         password,
       });
 
+      console.log("✅ Admin login response:", response.data);
+
       if (response.data.success) {
         setToken(response.data.token);
         toast.success("Login successful.");
       } else {
-        toast.error(response.data.message);
+        toast.error(response.data.message || "Login failed. Please check your credentials.");
       }
     } catch (error) {
-      console.error(error);
-      toast.error("Please try again later.");
+      console.error("❌ Admin login error:", error);
+      
+      // Better error messages
+      if (error.response) {
+        // Server responded with error
+        const errorMessage = error.response.data?.message || error.response.data?.error || "Login failed";
+        toast.error(errorMessage);
+        console.error("Error response:", error.response.data);
+      } else if (error.request) {
+        // Request was made but no response received
+        console.error("No response received. Backend URL:", backendUrl);
+        toast.error("Cannot connect to server. Please check your connection.");
+      } else {
+        // Something else happened
+        console.error("Error setting up request:", error.message);
+        toast.error("An error occurred. Please try again.");
+      }
+    } finally {
+      // Restore button state
+      submitButton.disabled = false;
+      submitButton.textContent = originalText;
     }
   };
 
