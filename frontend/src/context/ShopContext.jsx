@@ -67,7 +67,7 @@ const ShopContextProvider = (props) => {
     // Check environment variable first
     const envUrl = import.meta.env.VITE_BACKEND_URL;
     if (envUrl && envUrl.trim() !== '' && envUrl !== 'undefined') {
-
+      console.log("✅ Using backend URL from env:", envUrl);
       return envUrl;
     }
     
@@ -75,7 +75,7 @@ const ShopContextProvider = (props) => {
     if (typeof window !== 'undefined') {
       const hostname = window.location.hostname;
       const protocol = window.location.protocol;
-
+      console.log("🔍 Detecting environment - hostname:", hostname, "protocol:", protocol);
       
       // If NOT localhost or 127.0.0.1, assume production
       const isLocalhost = hostname === 'localhost' || 
@@ -87,18 +87,18 @@ const ShopContextProvider = (props) => {
       
       if (!isLocalhost) {
         const prodUrl = "https://backend-r6kj.onrender.com";
-
+        console.log("🌐 Detected production environment, using:", prodUrl);
         return prodUrl;
       }
     }
     
     // Default to localhost for local development
-
+    console.log("💻 Using localhost backend URL for development");
     return "http://localhost:4000";
   };
   
   const backendUrl = getBackendUrl();
-
+  console.log("🎯 Final backend URL:", backendUrl);
   
   useEffect(() => {
   const fetchProducts = async () => {
@@ -114,7 +114,7 @@ const ShopContextProvider = (props) => {
       
       for (const endpoint of endpoints) {
         try {
-
+          console.log("Fetching products from:", endpoint);
           const res = await fetch(endpoint, {
             method: 'GET',
             headers: {
@@ -127,7 +127,7 @@ const ShopContextProvider = (props) => {
           }
           
           data = await res.json();
-
+          console.log("Products fetched:", data);
           
           // Handle different response formats
           if (data.products && Array.isArray(data.products)) {
@@ -138,11 +138,11 @@ const ShopContextProvider = (props) => {
             setProducts(data);
             return;
           } else {
-
+            console.warn("Unexpected response format:", data);
             lastError = new Error("Unexpected response format");
           }
         } catch (err) {
-
+          console.error(`Error fetching from ${endpoint}:`, err);
           lastError = err;
           // Continue to next endpoint
         }
@@ -154,8 +154,8 @@ const ShopContextProvider = (props) => {
       }
       
     } catch (err) {
-
-
+      console.error("Error fetching products:", err);
+      console.error("Backend URL used:", backendUrl);
       toast.error("Failed to load products. Please check your connection.");
       // Set empty array to prevent undefined errors
       setProducts([]);

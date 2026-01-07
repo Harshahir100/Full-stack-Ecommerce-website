@@ -9,7 +9,42 @@ import Login from "./components/Login";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-export const backendUrl = import.meta.env.VITE_BACKEND_URL;
+// Get backend URL with production fallback
+const getBackendUrl = () => {
+  // Check environment variable first
+  const envUrl = import.meta.env.VITE_BACKEND_URL;
+  if (envUrl && envUrl.trim() !== '' && envUrl !== 'undefined') {
+    console.log("✅ Admin: Using backend URL from env:", envUrl);
+    return envUrl;
+  }
+  
+  // Auto-detect production environment at runtime
+  if (typeof window !== 'undefined') {
+    const hostname = window.location.hostname;
+    console.log("🔍 Admin: Detecting environment - hostname:", hostname);
+    
+    // If NOT localhost, assume production
+    const isLocalhost = hostname === 'localhost' || 
+                       hostname === '127.0.0.1' || 
+                       hostname === '0.0.0.0' ||
+                       hostname.startsWith('192.168.') ||
+                       hostname.startsWith('10.') ||
+                       hostname.startsWith('172.');
+    
+    if (!isLocalhost) {
+      const prodUrl = "https://backend-r6kj.onrender.com";
+      console.log("🌐 Admin: Detected production environment, using:", prodUrl);
+      return prodUrl;
+    }
+  }
+  
+  // Default to localhost for local development
+  console.log("💻 Admin: Using localhost backend URL for development");
+  return "http://localhost:4000";
+};
+
+export const backendUrl = getBackendUrl();
+console.log("🎯 Admin: Final backend URL:", backendUrl);
 
 export const currency = (price) => {
   return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(price);
