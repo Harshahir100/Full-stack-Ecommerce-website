@@ -6,26 +6,30 @@ import connectCloudinary from "./config/cloudinary.js";
 import userRouter from "./routes/userRoute.js";
 import productRouter from "./routes/productRoute.js";
 
-// INFO: Create express app
+// Create express app
 const app = express();
-const port = process.env.PORT || 4000;
+
+// IMPORTANT: Use Render port
+const PORT = process.env.PORT || 4000;
+
+// Connect services
 connectDB();
 connectCloudinary();
 
-// INFO: Middleware
+// Middleware
 app.use(express.json());
 app.use(cors());
 
-// INFO: API endpoints
+// Routes
 app.use("/api/user", userRouter);
 app.use("/api/product", productRouter);
 
-// INFO: Default route
+// Health check
 app.get("/", (req, res) => {
   res.send("API is running...");
 });
 
-// INFO: Start server
-app.listen(port, () =>
-  console.log(`Server is running on at http://localhost:${port}`)
-);
+// Start server
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
