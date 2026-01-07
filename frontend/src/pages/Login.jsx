@@ -14,7 +14,32 @@ const Login = () => {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:4000";
+  // Get backend URL - same logic as ShopContext
+  const getBackendUrl = () => {
+    const envUrl = import.meta.env.VITE_BACKEND_URL;
+    if (envUrl && envUrl.trim() !== '') {
+      return envUrl;
+    }
+    
+    if (typeof window !== 'undefined') {
+      const hostname = window.location.hostname;
+      const protocol = window.location.protocol;
+      
+      // If deployed on Render (production)
+      if (hostname.includes('render.com') || hostname.includes('onrender.com')) {
+        return "https://backend-r6kj.onrender.com";
+      }
+      
+      // If using HTTPS in production (not localhost)
+      if (protocol === 'https:' && hostname !== 'localhost' && !hostname.includes('127.0.0.1')) {
+        return "https://backend-r6kj.onrender.com";
+      }
+    }
+    
+    return "http://localhost:4000";
+  };
+  
+  const backendUrl = getBackendUrl();
 
   const onSubmitHandler = async (event) => {
     event.preventDefault();

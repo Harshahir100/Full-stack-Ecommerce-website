@@ -62,20 +62,43 @@ const ShopContextProvider = (props) => {
     localStorage.removeItem("userInfo");
   };
   
-  // Use production URL as fallback if env var is not set
+  // Get backend URL - prioritize env var, then detect production, then localhost
   const getBackendUrl = () => {
+    // Check environment variable first
     const envUrl = import.meta.env.VITE_BACKEND_URL;
-    if (envUrl) return envUrl;
-    
-    // Auto-detect production environment
-    if (typeof window !== 'undefined' && window.location.hostname.includes('render.com')) {
-      return "https://backend-r6kj.onrender.com";
+    if (envUrl && envUrl.trim() !== '' && envUrl !== 'undefined') {
+      console.log("✅ Using backend URL from env:", envUrl);
+      return envUrl;
     }
     
+    // Auto-detect production environment at runtime
+    if (typeof window !== 'undefined') {
+      const hostname = window.location.hostname;
+      const protocol = window.location.protocol;
+      console.log("🔍 Detecting environment - hostname:", hostname, "protocol:", protocol);
+      
+      // If NOT localhost or 127.0.0.1, assume production
+      const isLocalhost = hostname === 'localhost' || 
+                         hostname === '127.0.0.1' || 
+                         hostname === '0.0.0.0' ||
+                         hostname.startsWith('192.168.') ||
+                         hostname.startsWith('10.') ||
+                         hostname.startsWith('172.');
+      
+      if (!isLocalhost) {
+        const prodUrl = "https://backend-r6kj.onrender.com";
+        console.log("🌐 Detected production environment, using:", prodUrl);
+        return prodUrl;
+      }
+    }
+    
+    // Default to localhost for local development
+    console.log("💻 Using localhost backend URL for development");
     return "http://localhost:4000";
   };
   
   const backendUrl = getBackendUrl();
+  console.log("🎯 Final backend URL:", backendUrl);
   
   useEffect(() => {
   const fetchProducts = async () => {
