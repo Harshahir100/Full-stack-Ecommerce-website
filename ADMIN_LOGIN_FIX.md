@@ -93,3 +93,4 @@ VITE_BACKEND_URL=https://backend-r6kj.onrender.com
 
 (Optional - auto-detection should work, but setting it explicitly is more reliable)
 
+
