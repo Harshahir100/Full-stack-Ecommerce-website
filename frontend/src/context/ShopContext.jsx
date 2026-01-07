@@ -62,31 +62,85 @@ const ShopContextProvider = (props) => {
     localStorage.removeItem("userInfo");
   };
   
-  const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:4000";
+  // Use production URL as fallback if env var is not set
+  const getBackendUrl = () => {
+    const envUrl = import.meta.env.VITE_BACKEND_URL;
+    if (envUrl) return envUrl;
+    
+    // Auto-detect production environment
+    if (typeof window !== 'undefined' && window.location.hostname.includes('render.com')) {
+      return "https://backend-r6kj.onrender.com";
+    }
+    
+    return "http://localhost:4000";
+  };
+  
+  const backendUrl = getBackendUrl();
   
   useEffect(() => {
   const fetchProducts = async () => {
     try {
-      console.log("Fetching products from:", `${backendUrl}/api/product/list`);
-      const res = await fetch(`${backendUrl}/api/product/list`);
-      if (!res.ok) {
-        throw new Error(`HTTP error! status: ${res.status}`);
+      // Try /api/product/list first, then fallback to /api/product
+      const endpoints = [
+        `${backendUrl}/api/product/list`,
+        `${backendUrl}/api/product`
+      ];
+      
+      let data = null;
+      let lastError = null;
+      
+      for (const endpoint of endpoints) {
+        try {
+          console.log("Fetching products from:", endpoint);
+          const res = await fetch(endpoint, {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          });
+          
+          if (!res.ok) {
+            throw new Error(`HTTP error! status: ${res.status}`);
+          }
+          
+          data = await res.json();
+          console.log("Products fetched:", data);
+          
+          // Handle different response formats
+          if (data.products && Array.isArray(data.products)) {
+            setProducts(data.products);
+            return; // Success, exit function
+          } else if (Array.isArray(data)) {
+            // If response is directly an array
+            setProducts(data);
+            return;
+          } else {
+            console.warn("Unexpected response format:", data);
+            lastError = new Error("Unexpected response format");
+          }
+        } catch (err) {
+          console.error(`Error fetching from ${endpoint}:`, err);
+          lastError = err;
+          // Continue to next endpoint
+        }
       }
-      const data = await res.json();
-      console.log("Products fetched:", data);
-      if (data.products) {
-        setProducts(data.products);
-      } else {
-        console.error("No products in response:", data);
+      
+      // If we get here, all endpoints failed
+      if (lastError) {
+        throw lastError;
       }
+      
     } catch (err) {
       console.error("Error fetching products:", err);
+      console.error("Backend URL used:", backendUrl);
       toast.error("Failed to load products. Please check your connection.");
+      // Set empty array to prevent undefined errors
+      setProducts([]);
     }
   };
 
   fetchProducts();
-  }, []);
+  }, [backendUrl]);
   const navigate = useNavigate();
 
   const currency = "₹";
