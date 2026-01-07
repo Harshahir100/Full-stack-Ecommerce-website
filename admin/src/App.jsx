@@ -59,7 +59,7 @@ const App = () => {
   }, [token]);
 
   return (
-    <div className="min-h-screen bg-gray-600">
+    <div className="min-h-screen bg-gray-100">
       <ToastContainer
         position="top-right"
         autoClose={5000}
