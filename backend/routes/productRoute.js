@@ -10,6 +10,9 @@ import adminAuth from "../middleware/adminAuth.js";
 
 const productRouter = express.Router();
 
+// GET /api/product - Returns all products (same as /list)
+productRouter.get("/", listProducts);
+
 productRouter.post(
   "/add",
   adminAuth,

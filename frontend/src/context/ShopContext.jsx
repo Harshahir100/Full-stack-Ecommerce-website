@@ -67,11 +67,21 @@ const ShopContextProvider = (props) => {
   useEffect(() => {
   const fetchProducts = async () => {
     try {
+      console.log("Fetching products from:", `${backendUrl}/api/product/list`);
       const res = await fetch(`${backendUrl}/api/product/list`);
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
       const data = await res.json();
-      setProducts(data.products);
+      console.log("Products fetched:", data);
+      if (data.products) {
+        setProducts(data.products);
+      } else {
+        console.error("No products in response:", data);
+      }
     } catch (err) {
       console.error("Error fetching products:", err);
+      toast.error("Failed to load products. Please check your connection.");
     }
   };
 
