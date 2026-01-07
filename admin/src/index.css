@@ -15,7 +15,7 @@ select, input, textarea{
 }
 
 .active {
-  background-color: #00aeff;
+  background-color: #ade5ff67;
   border-color: #1d1c1c;
   border-width: 2px;
   border-right: 0;
