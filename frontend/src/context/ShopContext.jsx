@@ -61,10 +61,13 @@ const ShopContextProvider = (props) => {
     setUser(null);
     localStorage.removeItem("userInfo");
   };
+  
+  const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:4000";
+  
   useEffect(() => {
   const fetchProducts = async () => {
     try {
-      const res = await fetch("http://localhost:4000/api/product/list");
+      const res = await fetch(`${backendUrl}/api/product/list`);
       const data = await res.json();
       setProducts(data.products);
     } catch (err) {

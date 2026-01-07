@@ -14,6 +14,8 @@ const Login = () => {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:4000";
+
   const onSubmitHandler = async (event) => {
     event.preventDefault();
     setError("");
@@ -21,8 +23,8 @@ const Login = () => {
     try {
       const endpoint =
         currentState === "Login"
-          ? "http://localhost:4000/api/user/login"
-          : "http://localhost:4000/api/user/register";
+          ? `${backendUrl}/api/user/login`
+          : `${backendUrl}/api/user/register`;
       const payload =
         currentState === "Login"
           ? { email, password }
